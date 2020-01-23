@@ -1,3 +1,13 @@
 {
-  "sqltools.connections": []
+  "sqltools.connections": [
+    {
+      "database": "adonis",
+      "dialect": "PostgreSQL",
+      "name": "adonis@localhost",
+      "password": "sidinei",
+      "port": 5432,
+      "server": "localhost",
+      "username": "sidinei"
+    }
+  ]
 }
