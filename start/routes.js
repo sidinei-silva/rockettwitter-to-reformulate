@@ -17,3 +17,4 @@
 const Route = use('Route')
 
 Route.post("/register", 'AuthController.register')
+Route.post("/auth", 'AuthController.authenticate')
