@@ -1,8 +1,9 @@
 'use strict'
 
+const Tweet = use('App/Models/Tweet')
+
 /** @typedef {import('@adonisjs/framework/src/Request')} Request */
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
-/** @typedef {import('@adonisjs/framework/src/View')} View */
 
 /**
  * Resourceful controller for interacting with tweets
@@ -11,25 +12,11 @@ class TweetController {
   /**
    * Show a list of all tweets.
    * GET tweets
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
+  async index () {
+    const tweets = await Tweet.all()
 
-  /**
-   * Render a form to be used for creating a new tweet.
-   * GET tweets/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+    return tweets;
   }
 
   /**
@@ -40,7 +27,13 @@ class TweetController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ request, auth }) {
+    const data = request.only(['content'])
+
+     const tweet = await Tweet.create({user_id: auth.user.id, ...data});
+
+     return tweet;
+
   }
 
   /**
@@ -48,34 +41,11 @@ class TweetController {
    * GET tweets/:id
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
+  async show ({ params }) {
+    const tweet = await Tweet.findOrFail(params.id);
 
-  /**
-   * Render a form to update an existing tweet.
-   * GET tweets/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update tweet details.
-   * PUT or PATCH tweets/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
+    return tweet;
   }
 
   /**
@@ -83,10 +53,13 @@ class TweetController {
    * DELETE tweets/:id
    *
    * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params, auth, response }) {
+    const tweet = await Tweet.findOrFail(params.id);
+    if(tweet.user_id !== auth.user.id){
+      return response.status(401)
+    }
+    await tweet.delete();
   }
 }
 
